@@ -1,4 +1,3 @@
--- settings
 vim.cmd [[set nu]]
 vim.cmd [[set rnu]]
 vim.g.mapleader = " "
@@ -116,14 +115,29 @@ local plugins = {
       "hrsh7th/cmp-cmdline",
       "L3MON4D3/LuaSnip",
       "saadparwaiz1/cmp_luasnip",
+      "onsails/lspkind.nvim",  -- Icons for completion items
+      "nvim-tree/nvim-web-devicons",  -- File icons
     },
     config = function()
       local cmp = require("cmp")
+      local lspkind = require("lspkind")
+
       cmp.setup({
         snippet = {
           expand = function(args)
             require("luasnip").lsp_expand(args.body)
           end,
+        },
+        window = {
+          completion = cmp.config.window.bordered(),  -- Rounded borders for completion menu
+          documentation = cmp.config.window.bordered(),  -- Rounded borders for documentation
+        },
+        formatting = {
+          format = lspkind.cmp_format({
+            mode = "symbol_text",  -- Show both symbol and text
+            maxwidth = 50,  -- Limit the width of the completion items
+            ellipsis_char = "...",  -- Truncate long items
+          }),
         },
         mapping = cmp.mapping.preset.insert({
           ["<C-d>"] = cmp.mapping.scroll_docs(-4),
@@ -144,6 +158,27 @@ local plugins = {
       })
     end,
   },
+  {
+    "onsails/lspkind.nvim",  -- Separate setup for icons
+    config = function()
+      require("lspkind").init()
+    end
+  },
+  {
+    "folke/noice.nvim",
+    event = "VeryLazy",
+    opts = {
+      -- add any options here
+    },
+    dependencies = {
+      -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+      "MunifTanjim/nui.nvim",
+      -- OPTIONAL:
+      --   `nvim-notify` is only needed, if you want to use the notification view.
+      --   If not available, we use `mini` as the fallback
+      "rcarriga/nvim-notify",
+      }
+    }
 }
 
 local opts = {
@@ -154,7 +189,7 @@ require("lazy").setup(plugins, opts)
 
 -- keymaps
 vim.keymap.set("n", "<leader>cr", vim.lsp.buf.rename, {desc = "Rename variable"})
-vim.keymap.set("n", "<leader>cg", vim.lsp.buf.definition, { desc = "go to definition" })
+vim.keymap.set("n", "<leader>cg", vim.lsp.buf.definition, { desc = "Go to definition" })
 vim.keymap.set("n", "<leader>sf", function() vim.cmd [[Telescope fd]] end, {desc = "Find files"})
 vim.keymap.set("n", "<leader>sg", function() vim.cmd [[Telescope live_grep]] end, {desc = "Live grep"})
 vim.keymap.set("n", "<leader>ff", function() vim.cmd [[Neotree position=left toggle]] end, {desc = "File tree"})
@@ -164,6 +199,8 @@ require("lualine").setup{}
 
 -- colorscheme
 vim.cmd [[colorscheme catppuccin-mocha]]
+
+-- Treesitter setup for syntax highlighting
 require("nvim-treesitter.configs").setup {
   ensure_installed = {"lua", "python"},
   sync_install = false,
@@ -172,3 +209,6 @@ require("nvim-treesitter.configs").setup {
     enable = true,
   },
 }
+
+-- noice (command line)
+require("noice").setup({})
