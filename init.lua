@@ -1,7 +1,9 @@
 -- PERF: Vim settings.
-vim.cmd [[set nu]]
-vim.cmd [[set rnu]]
-vim.cmd [[set cursorline]]
+vim.o.timeout = true
+vim.o.rnu = true
+vim.o.nu = true
+vim.o.cursorline = true
+vim.o.timeoutlen = 200
 vim.g.mapleader = " "
 
 -- PERF: This checks if i have lazy vim installed and installs it for me if i do not.
@@ -140,6 +142,11 @@ local plugins = {
     },
   },
 
+  -- PERF: Popup to teach keybinds to noobs
+  {
+    "folke/which-key.nvim"
+  },
+
   -- PERF: Auto-closing braces
   {
     "windwp/nvim-autopairs",
@@ -204,7 +211,7 @@ require("lazy").setup(plugins, opts)
 vim.keymap.set("n", "<leader>cr", vim.lsp.buf.rename, {desc = "Rename variable"})
 vim.keymap.set("n", "<leader>cg", vim.lsp.buf.definition, { desc = "Go to definition" })
 vim.keymap.set("n", "<leader>sf", function() vim.cmd [[Telescope fd]] end, {desc = "Find files"})
-vim.keymap.set("n", "<leader>sg", function() vim.cmd [[Telescope live_grep]] end, {desc = "Live grep"})
+vim.keymap.set("n", "<leader>sg", function() vim.cmd [[Telescope live_grep]] end, {desc = "Find word"})
 vim.keymap.set("n", "<leader>ff", function() vim.cmd [[Neotree position=left toggle]] end, {desc = "File tree"})
 vim.keymap.set("n", "<leader>bn", function() vim.cmd([[bnext]]) end, {desc = "Next buffer (tab)"})
 vim.keymap.set("n", "<Esc>", function() vim.cmd([[nohlsearch]]) end, {desc = "Clear search highlighting"})
@@ -226,6 +233,21 @@ require("nvim-treesitter.configs").setup {
   },
 }
 
--- PERF: Loading statusbar and command line plugins
+-- PERF: Loading statusbar,command line
 require("noice").setup({})
 require("lualine").setup{}
+require("which-key").setup{}
+
+-- PERF: Setting up keybind preview plugin
+require("which-key").register({
+  ["<leader>s"] = { name = "Search", _ = "which_key_ignore" },
+  ["<leader>f"] = { name = "File explorer", _ = "which_key_ignore" },
+  ["<leader>c"] = { name = "Code", _ = "which_key_ignore" },
+  ["<leader>d"] = { name = "Errors", _ = "which_key_ignore" },
+  ["<leader>b"] = { name = "Buffers", _ = "which_key_ignore" },
+})
+
+-- PERF: Setting statusbar height
+vim.defer_fn(function()
+	vim.cmd([[set cmdheight=1]])
+end, 100)
