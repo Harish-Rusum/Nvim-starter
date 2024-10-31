@@ -273,3 +273,8 @@ end
 setIndent("lua", 2, 2)
 setIndent("python", 4, 4)
 setIndent("cpp", 4, 4)
+
+-- PERF: Global clipboard
+vim.schedule(function()
+	vim.opt.clipboard = "unnamedplus"
+end)
