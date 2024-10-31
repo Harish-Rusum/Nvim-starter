@@ -1,12 +1,14 @@
--- PERF: Vim settings.
+-- Vim settings.
 vim.o.timeout = true
 vim.o.rnu = true
 vim.o.nu = true
 vim.o.cursorline = true
 vim.o.timeoutlen = 200
 vim.g.mapleader = " "
+vim.o.fillchars = "eob: "
+vim.o.laststatus = 3
 
--- PERF: This checks if i have lazy vim installed and installs it for me if i do not.
+-- This checks if i have lazy vim installed and installs it for me if i do not.
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
 	vim.fn.system({
@@ -20,15 +22,15 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- PERF: Defining plugins
+-- Defining plugins
 local plugins = {
 
-	-- PERF: Colorschemes
+	-- Colorschemes
 	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 },
 	{ "folke/tokyonight.nvim", lazy = false, priority = 1000 },
 	{ "rose-pine/neovim", name = "rose-pine" },
 
-	-- PERF: For installing dependencies
+	-- For installing dependencies
 	{
 		"williamboman/mason.nvim",
 		config = function()
@@ -36,7 +38,7 @@ local plugins = {
 		end
 	},
 
-	-- PERF: For lsp (language support)
+	-- For lsp (language support)
 	{
 		"williamboman/mason-lspconfig.nvim",
 		dependencies = { "neovim/nvim-lspconfig" },
@@ -71,7 +73,7 @@ local plugins = {
 		dependencies = { "nvim-lua/plenary.nvim" }
 	},
 
-	-- PERF: Autocomplete
+	-- Autocomplete
 	{
 		"hrsh7th/nvim-cmp",
 		dependencies = {
@@ -122,13 +124,13 @@ local plugins = {
 		end,
 	},
 
-	-- PERF: Highlighting
+	-- Highlighting
 	{ "nvim-treesitter/nvim-treesitter" },
 
-	-- PERF: For searching
+	-- For searching
 	{ "nvim-telescope/telescope.nvim", tag = "0.1.8"},
 
-	-- PERF: For project wide errors
+	-- For project wide errors
 	{
 		"folke/trouble.nvim",
 		opts = {},
@@ -142,28 +144,28 @@ local plugins = {
 		},
 	},
 
-	-- PERF: Popup to teach keybinds to noobs
+	-- Popup to teach keybinds to noobs
 	{
 		"folke/which-key.nvim"
 	},
 
-	-- PERF: Buffer's (on the top)
+	-- Buffer's (on the top)
 	{'akinsho/bufferline.nvim', version = "*", dependencies = 'nvim-tree/nvim-web-devicons'},
 
-	-- PERF: Auto-closing braces
+	-- Auto-closing braces
 	{
 		"windwp/nvim-autopairs",
 		event = "InsertEnter",
 		config = true,
 	},
 
-	-- PERF: Status bar
+	-- Status bar
 	{
 		'nvim-lualine/lualine.nvim',
 		dependencies = { 'nvim-tree/nvim-web-devicons' }
 	},
 
-	-- PERF: File tree
+	-- File tree
 	{
 		"nvim-neo-tree/neo-tree.nvim",
 		branch = "v3.x",
@@ -174,14 +176,14 @@ local plugins = {
 		}
 	},
 
-	-- PERF: Indent lines
+	-- Indent lines
 	{
 		"lukas-reineke/indent-blankline.nvim",
 		main = "ibl",
 		opts = {},
 	},
 
-	-- PERF: Fancy command line
+	-- Fancy command line
 	{
 		"folke/noice.nvim",
 		event = "VeryLazy",
@@ -193,24 +195,17 @@ local plugins = {
 		}
 	},
 
-	-- PERF: These fancy comments
-	{
-		"folke/todo-comments.nvim",
-		config = function()
-			require("todo-comments").setup {}
-		end
-	},
 }
 
--- PERF: UI options
+-- UI options
 local opts = {
 	ui = { border = "rounded" },
 }
 
--- PERF: Actuall installing plugins and options
+-- Actuall installing plugins and options
 require("lazy").setup(plugins, opts)
 
--- PERF: Keymaps
+-- Keymaps
 vim.keymap.set("n", "<leader>cr", vim.lsp.buf.rename, {desc = "Rename variable"})
 vim.keymap.set("n", "<leader>cg", vim.lsp.buf.definition, { desc = "Go to definition" })
 vim.keymap.set("n", "<leader>sf", function() vim.cmd [[Telescope fd]] end, {desc = "Find files"})
@@ -220,10 +215,10 @@ vim.keymap.set("n", "<Tab>", function() vim.cmd([[bnext]]) end, {desc = "Next bu
 vim.keymap.set("n", "<Esc>", function() vim.cmd([[nohlsearch]]) end, {desc = "Clear search highlighting"})
 
 
--- PERF: set colorscheme
+-- set colorscheme
 vim.cmd [[colorscheme catppuccin-mocha]]
 
--- PERF: setting up indenting and highlighting for lua and python
+-- setting up indenting and highlighting for lua and python
 require("nvim-treesitter.configs").setup {
 	ensure_installed = {"lua", "python"},
 	sync_install = false,
@@ -236,12 +231,12 @@ require("nvim-treesitter.configs").setup {
 	},
 }
 
--- PERF: Loading statusbar,command line
+-- Loading statusbar,command line
 require("noice").setup({})
 require("lualine").setup{}
 require("which-key").setup{}
 
--- PERF: Setting up keybind preview plugin
+-- Setting up keybind preview plugin
 require("which-key").register({
 	["<leader>s"] = { name = "Search", _ = "which_key_ignore" },
 	["<leader>f"] = { name = "File explorer", _ = "which_key_ignore" },
@@ -249,16 +244,16 @@ require("which-key").register({
 	["<leader>d"] = { name = "Errors", _ = "which_key_ignore" },
 })
 
--- PERF: Setting up bufferline
+-- Setting up bufferline
 vim.opt.termguicolors = true
 require("bufferline").setup{}
 
--- PERF: Setting statusbar height
+-- Setting statusbar height
 vim.defer_fn(function()
 	vim.cmd([[set cmdheight=1]])
 end, 100)
 
--- PERF: Custom indent width
+-- Custom indent width
 local IndentGroup = vim.api.nvim_create_augroup("CustomIndent", { clear = true })
 local function setIndent(filetype, shiftwidth, tabstop)
 	vim.api.nvim_create_autocmd("FileType", {
@@ -274,7 +269,7 @@ setIndent("lua", 2, 2)
 setIndent("python", 4, 4)
 setIndent("cpp", 4, 4)
 
--- PERF: Global clipboard
+-- Global clipboard
 vim.schedule(function()
 	vim.opt.clipboard = "unnamedplus"
 end)
