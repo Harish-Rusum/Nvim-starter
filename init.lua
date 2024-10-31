@@ -1,12 +1,11 @@
+-- PERF: Vim settings.
 vim.cmd [[set nu]]
 vim.cmd [[set rnu]]
+vim.cmd [[set cursorline]]
 vim.g.mapleader = " "
 
--- plugin manager
+-- PERF: This checks if i have lazy vim installed and installs it for me if i do not.
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-vim.keymap.set("n", "<leader>bn", function()
-	vim.cmd([[bnext]])
-end)
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
 	vim.fn.system({
 		"git",
@@ -19,17 +18,23 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- load plugins
+-- PERF: Defining plugins
 local plugins = {
+
+  -- PERF: Colorschemes
   { "catppuccin/nvim", name = "catppuccin", priority = 1000 },
   { "folke/tokyonight.nvim", lazy = false, priority = 1000 },
   { "rose-pine/neovim", name = "rose-pine" },
+
+  -- PERF: For installing dependencies
   {
     "williamboman/mason.nvim",
     config = function()
       require("mason").setup()
     end
   },
+
+  -- PERF: For lsp (language support)
   {
     "williamboman/mason-lspconfig.nvim",
     dependencies = { "neovim/nvim-lspconfig" },
@@ -63,49 +68,8 @@ local plugins = {
     end,
     dependencies = { "nvim-lua/plenary.nvim" }
   },
-  { "nvim-treesitter/nvim-treesitter" },
-  { "nvim-telescope/telescope.nvim", tag = "0.1.8"},
-  {
-    "folke/trouble.nvim",
-    opts = {},
-    cmd = "Trouble",
-    keys = {
-      {
-        "<leader>ed",
-        "<cmd>Trouble diagnostics<cr>",
-        desc = "Diagnostics (Trouble)",
-      },
-      {
-        "<leader>ef",
-        "<cmd>Trouble diagnostics filter.buf=0<cr>",
-        desc = "Buffer Diagnostics (Trouble)",
-      },
-    },
-  },
-  {
-    "windwp/nvim-autopairs",
-    event = "InsertEnter",
-    config = true,
-  },
-  {
-      'nvim-lualine/lualine.nvim',
-      dependencies = { 'nvim-tree/nvim-web-devicons' }
-  },
-  {
-      "nvim-neo-tree/neo-tree.nvim",
-      branch = "v3.x",
-      dependencies = {
-        "nvim-lua/plenary.nvim",
-        "nvim-tree/nvim-web-devicons",
-        "MunifTanjim/nui.nvim",
-      }
-  },
-  {
-      "lukas-reineke/indent-blankline.nvim",
-      main = "ibl",
-      opts = {},
-  },
-  -- Code completion plugins
+
+  -- PERF: Autocomplete
   {
     "hrsh7th/nvim-cmp",
     dependencies = {
@@ -115,8 +79,8 @@ local plugins = {
       "hrsh7th/cmp-cmdline",
       "L3MON4D3/LuaSnip",
       "saadparwaiz1/cmp_luasnip",
-      "onsails/lspkind.nvim",  -- Icons for completion items
-      "nvim-tree/nvim-web-devicons",  -- File icons
+      "onsails/lspkind.nvim",
+      "nvim-tree/nvim-web-devicons",
     },
     config = function()
       local cmp = require("cmp")
@@ -129,21 +93,18 @@ local plugins = {
           end,
         },
         window = {
-          completion = cmp.config.window.bordered(),  -- Rounded borders for completion menu
-          documentation = cmp.config.window.bordered(),  -- Rounded borders for documentation
+          completion = cmp.config.window.bordered(),
+          documentation = cmp.config.window.bordered(),
         },
         formatting = {
           format = lspkind.cmp_format({
-            mode = "symbol_text",  -- Show both symbol and text
-            maxwidth = 50,  -- Limit the width of the completion items
-            ellipsis_char = "...",  -- Truncate long items
+            mode = "symbol_text",
+            maxwidth = 50,
+            ellipsis_char = "...",
           }),
         },
         mapping = cmp.mapping.preset.insert({
-          ["<C-d>"] = cmp.mapping.scroll_docs(-4),
-          ["<C-f>"] = cmp.mapping.scroll_docs(4),
-          ["<C-Space>"] = cmp.mapping.complete(),
-          ["<C-e>"] = cmp.mapping.close(),
+          ["<Esc>"] = cmp.mapping.close(),
           ["<CR>"] = cmp.mapping.confirm({
             behavior = cmp.ConfirmBehavior.Replace,
             select = true,
@@ -158,49 +119,101 @@ local plugins = {
       })
     end,
   },
+
+  -- PERF: Highlighting
+  { "nvim-treesitter/nvim-treesitter" },
+
+  -- PERF: For searching
+  { "nvim-telescope/telescope.nvim", tag = "0.1.8"},
+
+  -- PERF: For project wide errors
   {
-    "onsails/lspkind.nvim",  -- Separate setup for icons
-    config = function()
-      require("lspkind").init()
-    end
+    "folke/trouble.nvim",
+    opts = {},
+    cmd = "Trouble",
+    keys = {
+      {
+        "<leader>ed",
+        "<cmd>Trouble diagnostics<cr>",
+        desc = "Diagnostics (Trouble)",
+      },
+    },
   },
+
+  -- PERF: Auto-closing braces
+  {
+    "windwp/nvim-autopairs",
+    event = "InsertEnter",
+    config = true,
+  },
+
+  -- PERF: Status bar
+  {
+      'nvim-lualine/lualine.nvim',
+      dependencies = { 'nvim-tree/nvim-web-devicons' }
+  },
+
+  -- PERF: File tree
+  {
+      "nvim-neo-tree/neo-tree.nvim",
+      branch = "v3.x",
+      dependencies = {
+        "nvim-lua/plenary.nvim",
+        "nvim-tree/nvim-web-devicons",
+        "MunifTanjim/nui.nvim",
+      }
+  },
+
+  -- PERF: Indent lines
+  {
+      "lukas-reineke/indent-blankline.nvim",
+      main = "ibl",
+      opts = {},
+  },
+
+  -- PERF: Fancy command line
   {
     "folke/noice.nvim",
     event = "VeryLazy",
     opts = {
-      -- add any options here
     },
     dependencies = {
-      -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
       "MunifTanjim/nui.nvim",
-      -- OPTIONAL:
-      --   `nvim-notify` is only needed, if you want to use the notification view.
-      --   If not available, we use `mini` as the fallback
       "rcarriga/nvim-notify",
       }
-    }
+  },
+
+  -- PERF: These fancy comments
+  {
+    "folke/todo-comments.nvim",
+    config = function()
+      require("todo-comments").setup {}
+    end
+  },
 }
 
+-- PERF: UI options
 local opts = {
   ui = { border = "rounded" },
 }
 
+-- PERF: Actuall installing plugins and options
 require("lazy").setup(plugins, opts)
 
--- keymaps
+-- PERF: Keymaps
 vim.keymap.set("n", "<leader>cr", vim.lsp.buf.rename, {desc = "Rename variable"})
 vim.keymap.set("n", "<leader>cg", vim.lsp.buf.definition, { desc = "Go to definition" })
 vim.keymap.set("n", "<leader>sf", function() vim.cmd [[Telescope fd]] end, {desc = "Find files"})
 vim.keymap.set("n", "<leader>sg", function() vim.cmd [[Telescope live_grep]] end, {desc = "Live grep"})
 vim.keymap.set("n", "<leader>ff", function() vim.cmd [[Neotree position=left toggle]] end, {desc = "File tree"})
+vim.keymap.set("n", "<leader>bn", function() vim.cmd([[bnext]]) end, {desc = "Next buffer (tab)"})
+vim.keymap.set("n", "<Esc>", function() vim.cmd([[nohlsearch]]) end, {desc = "Clear search highlighting"})
 
--- status bar
-require("lualine").setup{}
 
--- colorscheme
+-- PERF: set colorscheme
 vim.cmd [[colorscheme catppuccin-mocha]]
 
--- Treesitter setup for syntax highlighting
+-- PERF: setting up indenting and highlighting for lua and python
 require("nvim-treesitter.configs").setup {
   ensure_installed = {"lua", "python"},
   sync_install = false,
@@ -208,7 +221,11 @@ require("nvim-treesitter.configs").setup {
   highlight = {
     enable = true,
   },
+  indent = {
+    enable = true,
+  },
 }
 
--- noice (command line)
+-- PERF: Loading statusbar and command line plugins
 require("noice").setup({})
+require("lualine").setup{}
