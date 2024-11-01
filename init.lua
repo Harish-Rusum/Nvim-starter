@@ -117,9 +117,9 @@ local plugins = {
 				sources = cmp.config.sources({
 					{ name = "nvim_lsp" },
 					{ name = "luasnip" },
-				}, {
+					}, {
 						{ name = "buffer" },
-					})
+				})
 			})
 		end,
 	},
@@ -183,6 +183,11 @@ local plugins = {
 		opts = {},
 	},
 
+	-- Terminal
+	{
+		"akinsho/toggleterm.nvim",
+	},
+
 	-- Fancy command line
 	{
 		"folke/noice.nvim",
@@ -210,7 +215,11 @@ vim.keymap.set("n", "<leader>cr", vim.lsp.buf.rename, {desc = "Rename variable"}
 vim.keymap.set("n", "<leader>cg", vim.lsp.buf.definition, { desc = "Go to definition" })
 vim.keymap.set("n", "<leader>sf", function() vim.cmd [[Telescope fd]] end, {desc = "Find files"})
 vim.keymap.set("n", "<leader>sg", function() vim.cmd [[Telescope live_grep]] end, {desc = "Find word"})
+vim.keymap.set("n", "<leader>tv", function() vim.cmd [[ToggleTerm direction=vertical]] end, {desc = "Vertical split terminal"})
+vim.keymap.set("n", "<leader>th", function() vim.cmd [[ToggleTerm direction=horizontal]] end, {desc = "Horizontal split terminal"})
+vim.keymap.set("n", "<leader>tf", function() vim.cmd [[ToggleTerm direction=float]] end, {desc = "FLoating terminal"})
 vim.keymap.set("n", "<leader>ff", function() vim.cmd [[Neotree position=left toggle]] end, {desc = "File tree"})
+vim.keymap.set("n", "<leader>rc", function() vim.cmd [[RunCpp]] end, {desc = "Run current c++ file"})
 vim.keymap.set("n", "<Tab>", function() vim.cmd([[bnext]]) end, {desc = "Next buffer (tab)"})
 vim.keymap.set("n", "<Esc>", function() vim.cmd([[nohlsearch]]) end, {desc = "Clear search highlighting"})
 
@@ -242,6 +251,8 @@ require("which-key").register({
 	["<leader>f"] = { name = "File explorer", _ = "which_key_ignore" },
 	["<leader>c"] = { name = "Code", _ = "which_key_ignore" },
 	["<leader>d"] = { name = "Errors", _ = "which_key_ignore" },
+	["<leader>t"] = { name = "Terminal", _ = "which_key_ignore" },
+	["<leader>r"] = { name = "Run", _ = "which_key_ignore" },
 })
 
 -- Setting up bufferline
@@ -273,3 +284,42 @@ setIndent("cpp", 4, 4)
 vim.schedule(function()
 	vim.opt.clipboard = "unnamedplus"
 end)
+
+-- Terminal
+require("toggleterm").setup({
+    direction = 'float',
+    float_opts = {
+        border = 'rounded',
+        winblend = 0,
+        highlights = {
+            border = "Normal",
+            background = "Normal",
+        },
+    },
+  highlights = {
+    Normal = {
+      guifg = "#789edb",
+      guibg = "none",
+    },
+    NormalFloat = {
+      guifg = "#789edb",
+      guibg = "none",
+    },
+	},
+	shade_terminal = false,
+	shading_factor = 0,
+	shell = vim.o.shell,
+})
+
+
+-- C++ running support
+local function compile_and_run_cpp()
+  local file = vim.fn.expand("%")
+  local output = "output"
+
+  local compile_cmd = string.format("g++ %s -o %s && clear && ./%s", file, output, output)
+
+  require("toggleterm").exec(compile_cmd, 1)
+end
+
+vim.api.nvim_create_user_command("RunCpp", compile_and_run_cpp, {})
